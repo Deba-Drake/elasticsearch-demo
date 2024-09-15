@@ -1,11 +1,14 @@
 package demo.elasticsearch.controllers;
 
+import co.elastic.clients.elasticsearch.core.SearchResponse;
 import demo.elasticsearch.entities.Product;
+import demo.elasticsearch.service.ElasticSearchService;
 import demo.elasticsearch.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.io.IOException;
+import java.util.Map;
 import java.util.Objects;
 
 @RestController @RequestMapping("/apis")
@@ -13,6 +16,9 @@ public class ProductController
 {
     @Autowired
     private ProductService productService;
+
+    @Autowired
+    private ElasticSearchService elasticSearchService;
 
     @GetMapping("/all-products")
     public Iterable<Product> allProducts()
@@ -24,6 +30,11 @@ public class ProductController
     public Product singleProduct(@PathVariable Integer id)
     {
         return productService.getProduct(id).orElseThrow(() -> new RuntimeException("Product " + id + " not found."));
+    }
+
+    @GetMapping("/product/match-all")
+    public String matchAll() throws IOException {
+        return elasticSearchService.matchALLService();
     }
 
     @PostMapping("/create-product")
@@ -46,7 +57,6 @@ public class ProductController
 
     @DeleteMapping("/product/{id}")
     public String removeProduct(@PathVariable Integer id) {
-        Product exisitngProduct = singleProduct(id);
-        return productService.deleteProduct(exisitngProduct);
+        return productService.deleteProduct(id);
     }
 }

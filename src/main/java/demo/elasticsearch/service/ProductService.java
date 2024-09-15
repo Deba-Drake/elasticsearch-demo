@@ -36,10 +36,9 @@ public class ProductService
         return productRepository.save(exisitngProduct);
     }
 
-    public String deleteProduct(Product exisitngProduct)
+    public String deleteProduct(Integer id)
     {
-        exisitngProduct.setIsAvailable(false);
-        productRepository.save(exisitngProduct);
+        productRepository.deleteById(id);
         return "Product is Deleted";
     }
 }
