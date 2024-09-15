@@ -1,6 +1,5 @@
 package demo.elasticsearch.controllers;
 
-import co.elastic.clients.elasticsearch.core.SearchResponse;
 import demo.elasticsearch.entities.Product;
 import demo.elasticsearch.service.ElasticSearchService;
 import demo.elasticsearch.service.ProductService;
@@ -8,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.util.Map;
+import java.util.List;
 import java.util.Objects;
 
 @RestController @RequestMapping("/apis")
@@ -26,17 +25,6 @@ public class ProductController
         return productService.getAllProducts();
     }
 
-    @GetMapping("/product/{id}")
-    public Product singleProduct(@PathVariable Integer id)
-    {
-        return productService.getProduct(id).orElseThrow(() -> new RuntimeException("Product " + id + " not found."));
-    }
-
-    @GetMapping("/product/match-all")
-    public String matchAll() throws IOException {
-        return elasticSearchService.matchALLService();
-    }
-
     @PostMapping("/create-product")
     public Product createProduct(@RequestBody Product product) {
         if (product.getName() == null || product.getName().trim().isEmpty() || product.getPrice() <= 0.00)
@@ -51,12 +39,21 @@ public class ProductController
     @PutMapping("/product/{id}")
     public Product updateProduct(@PathVariable Integer id, @RequestBody Product productDetails)
     {
-        Product exisitngProduct = singleProduct(id);
-        return productService.updateProduct(exisitngProduct,productDetails);
+        return productService.updateProduct(id,productDetails);
     }
 
     @DeleteMapping("/product/{id}")
     public String removeProduct(@PathVariable Integer id) {
         return productService.deleteProduct(id);
+    }
+
+    @GetMapping("/match-all")
+    public String matchAll() throws IOException {
+        return elasticSearchService.matchAllService();
+    }
+
+    @GetMapping("/product/match-all")
+    public List<Product> matchAllProducts() throws IOException {
+        return elasticSearchService.matchAllProductsService();
     }
 }

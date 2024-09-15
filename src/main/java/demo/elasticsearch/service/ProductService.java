@@ -18,22 +18,23 @@ public class ProductService
         return productRepository.findAll();
     }
 
-    public Optional<Product> getProduct(Integer id)
-    {
-        return productRepository.findById(id);
-    }
-
     public Product createProduct(Product product)
     {
         return productRepository.save(product);
     }
 
-    public Product updateProduct(Product exisitngProduct,Product productDetails)
-    {
-        exisitngProduct.setName(productDetails.getName());
-        exisitngProduct.setPrice(productDetails.getPrice());
-        exisitngProduct.setIsAvailable(productDetails.getIsAvailable());
-        return productRepository.save(exisitngProduct);
+    public Product updateProduct(Integer id, Product productDetails) {
+        Optional<Product> existingProductOptional = productRepository.findById(id);
+        if (existingProductOptional.isPresent()) {
+            Product existingProduct = existingProductOptional.get();
+
+            if (productDetails.getName() != null) existingProduct.setName(productDetails.getName());
+            if (productDetails.getPrice() != null) existingProduct.setPrice(productDetails.getPrice());
+            if (productDetails.getIsAvailable() != null) existingProduct.setIsAvailable(productDetails.getIsAvailable());
+
+            return productRepository.save(existingProduct);
+        }
+        else throw new RuntimeException("Product not found with ID: " + id); // Replace with a more appropriate exception if needed
     }
 
     public String deleteProduct(Integer id)
