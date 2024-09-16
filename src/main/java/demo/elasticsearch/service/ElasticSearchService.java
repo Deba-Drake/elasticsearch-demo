@@ -8,7 +8,6 @@ import demo.elasticsearch.entities.Product;
 import demo.elasticsearch.util.ElasticSearchUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,14 +20,26 @@ public class ElasticSearchService
     @Autowired
     private ElasticsearchClient elasticsearchClient;
 
-    public String matchAllService() throws IOException {
+    public String matchAll() throws IOException {
         Supplier<Query> supplier = ElasticSearchUtil.supplier();
         SearchResponse<Map> searchResponse= elasticsearchClient.search(s->s.query(supplier.get()),Map.class);
         return searchResponse.hits().hits().toString();
     }
 
-    public List<Product> matchAllProductsService() throws IOException {
+    public List<Product> matchAllProducts() throws IOException {
         Supplier<Query> supplier = ElasticSearchUtil.supplier();
+        SearchResponse<Product> searchResponse= elasticsearchClient.search(s->s.index("products").query(supplier.get()),Product.class);
+        List<Hit<Product>> listOfHitOfProducts = searchResponse.hits().hits();
+        List<Product> productList = new ArrayList<>();
+        for (Hit<Product> hit: listOfHitOfProducts)
+        {
+            productList.add(hit.source());
+        }
+        return productList;
+    }
+
+    public List<Product> matchProductsWithName(String nameValue) throws IOException {
+        Supplier<Query> supplier = ElasticSearchUtil.supplierWithName(nameValue);
         SearchResponse<Product> searchResponse= elasticsearchClient.search(s->s.index("products").query(supplier.get()),Product.class);
         List<Hit<Product>> listOfHitOfProducts = searchResponse.hits().hits();
         List<Product> productList = new ArrayList<>();

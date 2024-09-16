@@ -49,11 +49,16 @@ public class ProductController
 
     @GetMapping("/match-all")
     public String matchAll() throws IOException {
-        return elasticSearchService.matchAllService();
+        return elasticSearchService.matchAll();
     }
 
     @GetMapping("/product/match-all")
     public List<Product> matchAllProducts() throws IOException {
-        return elasticSearchService.matchAllProductsService();
+        return elasticSearchService.matchAllProducts();
+    }
+
+    @GetMapping("/product/match-all/{nameValue}")
+    public List<Product> matchAllProductsWithName(@PathVariable String nameValue) throws IOException {
+        return elasticSearchService.matchProductsWithName(nameValue);
     }
 }
